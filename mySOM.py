@@ -244,8 +244,8 @@ class MiniSom(object):
 
         zzzz =1
         d_w=1
-        while d_w > 0.0002:
-        #while not it.finished:
+        #while d_w > 0.0002:
+        while not it.finished:
             # eta * neighborhood_function * (x-w)
             x_w = (x - self._weights[it.multi_index])
             self._weights[it.multi_index] += g[it.multi_index] * x_w
@@ -253,6 +253,8 @@ class MiniSom(object):
             # normalization
             norm = fast_norm(self._weights[it.multi_index])
             self._weights[it.multi_index] = self._weights[it.multi_index]/norm
+            if d_w<0.0001:
+              break
             it.iternext()
             zzzz = zzzz+1
         print("converged in "+str(zzzz)+" iterations")
