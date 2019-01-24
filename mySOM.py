@@ -230,7 +230,7 @@ class MiniSom(object):
 		Current pattern to learn
 	win : tuple
 		Position of the winning neuron for x (array or tuple)
-		"""
+	"""
 
 
 	# improves the performances
