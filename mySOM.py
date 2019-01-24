@@ -1,5 +1,5 @@
 from math import sqrt
-
+import numpy
 from numpy import (array, unravel_index, nditer, linalg, random, subtract,
                    power, exp, pi, zeros, arange, outer, meshgrid, dot,
                    logical_and, mean, std, cov, argsort, linspace, transpose)
