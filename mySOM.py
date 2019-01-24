@@ -249,7 +249,7 @@ class MiniSom(object):
             # eta * neighborhood_function * (x-w)
             x_w = (x - self._weights[it.multi_index])
             self._weights[it.multi_index] += g[it.multi_index] * x_w
-            d_w = np.max(g[it.multi_index] * x_w)
+            d_w = numpy.max(g[it.multi_index] * x_w)
             # normalization
             norm = fast_norm(self._weights[it.multi_index])
             self._weights[it.multi_index] = self._weights[it.multi_index]/norm
