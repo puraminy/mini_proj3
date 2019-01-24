@@ -222,23 +222,22 @@ class MiniSom(object):
                              self._activation_map.shape)
 
     def update(self, x, win, eta, sig):
-		# improves the performances
-		g = self.neighborhood(win, sig)*eta
+	# improves the performances
+	g = self.neighborhood(win, sig)*eta
 
-		# print(f"eta ={eta}, sigma ={sig} ")
-		it = nditer(g, flags=['multi_index'])
-
-		while not it.finished:
-			# eta * neighborhood_function * (x-w)
-			# print("index", it.multi_index)
-			x_w = (x - self._weights[it.multi_index])
-			# print("delta = ", max(g[it.multi_index] * x_w))
-			self._weights[it.multi_index] += g[it.multi_index] * x_w
-			# normalization
-			norm = fast_norm(self._weights[it.multi_index])
-			self._weights[it.multi_index] = self._weights[it.multi_index]/norm
-			# print("norm:", norm)
-			it.iternext()
+	# print(f"eta ={eta}, sigma ={sig} ")
+	it = nditer(g, flags=['multi_index'])
+	while not it.finished:
+		# eta * neighborhood_function * (x-w)
+		# print("index", it.multi_index)
+		x_w = (x - self._weights[it.multi_index])
+		# print("delta = ", max(g[it.multi_index] * x_w))
+		self._weights[it.multi_index] += g[it.multi_index] * x_w
+		# normalization
+		norm = fast_norm(self._weights[it.multi_index])
+		self._weights[it.multi_index] = self._weights[it.multi_index]/norm
+		# print("norm:", norm)
+		it.iternext()
 			
     def quantization(self, data):
         """Assigns a code book (weights vector of the winning neuron)
