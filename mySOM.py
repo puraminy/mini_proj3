@@ -222,17 +222,7 @@ class MiniSom(object):
                              self._activation_map.shape)
 
     def update(self, x, win, eta, sig):
-	"""Updates the weights of the neurons.
-
-	Parameters
-	----------
-	x : np.array
-		Current pattern to learn
-	win : tuple
-		Position of the winning neuron for x (array or tuple)
-	"""
-
-
+	
 	# improves the performances
 	g = self.neighborhood(win, sig)*eta
 
