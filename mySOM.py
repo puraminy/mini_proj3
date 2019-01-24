@@ -222,24 +222,23 @@ class MiniSom(object):
                              self._activation_map.shape)
 
     def update(self, x, win, eta, sig):
-	
-	# improves the performances
-	g = self.neighborhood(win, sig)*eta
+		# improves the performances
+		g = self.neighborhood(win, sig)*eta
 
-	# print(f"eta ={eta}, sigma ={sig} ")
-	it = nditer(g, flags=['multi_index'])
+		# print(f"eta ={eta}, sigma ={sig} ")
+		it = nditer(g, flags=['multi_index'])
 
-	while not it.finished:
-		# eta * neighborhood_function * (x-w)
-		# print("index", it.multi_index)
-		x_w = (x - self._weights[it.multi_index])
-		# print("delta = ", max(g[it.multi_index] * x_w))
-		self._weights[it.multi_index] += g[it.multi_index] * x_w
-		# normalization
-		norm = fast_norm(self._weights[it.multi_index])
-		self._weights[it.multi_index] = self._weights[it.multi_index]/norm
-		# print("norm:", norm)
-		it.iternext()
+		while not it.finished:
+			# eta * neighborhood_function * (x-w)
+			# print("index", it.multi_index)
+			x_w = (x - self._weights[it.multi_index])
+			# print("delta = ", max(g[it.multi_index] * x_w))
+			self._weights[it.multi_index] += g[it.multi_index] * x_w
+			# normalization
+			norm = fast_norm(self._weights[it.multi_index])
+			self._weights[it.multi_index] = self._weights[it.multi_index]/norm
+			# print("norm:", norm)
+			it.iternext()
 			
     def quantization(self, data):
         """Assigns a code book (weights vector of the winning neuron)
@@ -299,50 +298,31 @@ class MiniSom(object):
             self.update(data[rand_i], self.winner(data[rand_i]),
                         iteration, num_iteration)
 
-    def train_batch(self, data, num_iteration, verbose=False):
-        """Trains using all the vectors in data sequentially"""
-        self._check_iteration_number(num_iteration)
-        self._check_input_len(data)
-        iterations = range(num_iteration)
-        if verbose:
-            iterations = _incremental_index_verbose(num_iteration)
 
-        for iteration in iterations:
-            idx = iteration % (len(data)-1)
-            self.update(data[idx], self.winner(data[idx]),
-                        iteration, num_iteration)
-    
-    
-    
-	def train_delta(self, data, delta, max_iteration, verbose=False):
-		"""Trains using all the vectors in data sequentially"""
-		# num_iteration = len(data)
-		self._check_iteration_number(max_iteration)
-		self._check_input_len(data)
-		iterations = range(max_iteration)
-		if verbose:
-			iterations = _incremental_index_verbose(max_iteration)
+    def train_delta(self, data, delta, max_iteration, verbose=False):
+	"""Trains using all the vectors in data sequentially"""
+	# num_iteration = len(data)
+	self._check_iteration_number(max_iteration)
+	self._check_input_len(data)
+	iterations = range(max_iteration)
+	if verbose:
+		iterations = _incremental_index_verbose(max_iteration)
+	delta_w = 1
+	for iteration in iterations:
+		# pick a random sample
+		old_weights = self._weights.copy()
+		eta = self._decay_function(self._learning_rate, iteration, max_iteration)
+		# sigma and learning rate decrease with the same rule
+		sig = self._decay_function(self._sigma, iteration, max_iteration)
 
-		delta_w = 1
-		for iteration in iterations:
-			# pick a random sample
-			old_weights = self._weights.copy()
-			eta = self._decay_function(self._learning_rate, iteration, max_iteration)
-			# sigma and learning rate decrease with the same rule
-			sig = self._decay_function(self._sigma, iteration, max_iteration)
+		rand_i = self._random_generator.randint(len(data))
+		self.update(data[rand_i], self.winner(data[rand_i]), eta, sig)
 
-			rand_i = self._random_generator.randint(len(data))
-			self.update(data[rand_i], self.winner(data[rand_i]), eta, sig)
-
-			# max_new = np.max(self._weights)
-			delta_w = np.max(np.abs(old_weights - self._weights))
-			print(f"iteration= {iteration} delta = {delta_w}")
-			if delta_w < delta:
-				break
-
-
-
-
+		# max_new = np.max(self._weights)
+		delta_w = np.max(np.abs(old_weights - self._weights))
+		print(f"iteration= {iteration} delta = {delta_w}")
+		if delta_w < delta:
+			break
     
     def distance_map(self):
         """Returns the distance map of the weights.
