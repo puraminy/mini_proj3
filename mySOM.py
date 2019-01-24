@@ -255,7 +255,7 @@ class MiniSom(object):
             self._weights[it.multi_index] = self._weights[it.multi_index]/norm
             it.iternext()
             zzzz = zzzz+1
-
+        print("converged in "+str(zzzz)+" iterations")
     def quantization(self, data):
         """Assigns a code book (weights vector of the winning neuron)
         to each sample in data."""
