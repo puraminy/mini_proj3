@@ -243,11 +243,13 @@ class MiniSom(object):
         it = nditer(g, flags=['multi_index'])
 
         zzzz =1
-        while g[it.multi_index] * x_w > 0.0002:
+        d_w=1
+        while d_w > 0.0002:
         #while not it.finished:
             # eta * neighborhood_function * (x-w)
             x_w = (x - self._weights[it.multi_index])
             self._weights[it.multi_index] += g[it.multi_index] * x_w
+            d_w = np.max(g[it.multi_index] * x_w)
             # normalization
             norm = fast_norm(self._weights[it.multi_index])
             self._weights[it.multi_index] = self._weights[it.multi_index]/norm
