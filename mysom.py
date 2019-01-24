@@ -348,7 +348,8 @@ class MiniSom(object):
             # max_new = np.max(self._weights)
             delta_w = np.mean(np.abs(old_weights - self._weights))
             #delta_w = np.max(np.abs(old_weights - self._weights))
-            print(f"iteration= {iteration} delta = {delta_w}")
+            if verbose:
+              print(f"iteration= {iteration} delta = {delta_w}")
             plt.plot(iteration, delta_w, 'bo')
             plt.xlabel('iteration')
             plt.ylabel('delta_w')
