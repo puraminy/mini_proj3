@@ -221,43 +221,36 @@ class MiniSom(object):
         return unravel_index(self._activation_map.argmin(),
                              self._activation_map.shape)
 
-    def update(self, x, win, t, max_iteration):
-        """Updates the weights of the neurons.
+    def update(self, x, win, eta, sig):
+		"""Updates the weights of the neurons.
 
-        Parameters
-        ----------
-        x : np.array
-            Current pattern to learn
-        win : tuple
-            Position of the winning neuron for x (array or tuple)
-        t : int
-            Iteration index
-        max_iteration : int
-            Maximum number of training itarations
-        """
-        eta = self._decay_function(self._learning_rate, t, max_iteration)
-        # sigma and learning rate decrease with the same rule
-        sig = self._decay_function(self._sigma, t, max_iteration)
-        # improves the performances
-        g = self.neighborhood(win, sig)*eta
-        it = nditer(g, flags=['multi_index'])
+		Parameters
+		----------
+		x : np.array
+			Current pattern to learn
+		win : tuple
+			Position of the winning neuron for x (array or tuple)
+			"""
 
-        zzzz =1
-        d_w=1
-        #while d_w > 0.0002:
-        while not it.finished:
-            # eta * neighborhood_function * (x-w)
-            x_w = (x - self._weights[it.multi_index])
-            self._weights[it.multi_index] += g[it.multi_index] * x_w
-            d_w = max(abs(g[it.multi_index] * x_w))
-            # normalization
-            norm = fast_norm(self._weights[it.multi_index])
-            self._weights[it.multi_index] = self._weights[it.multi_index]/norm
-            if d_w<0.0001:
-              break
-            it.iternext()
-            zzzz = zzzz+1
-        print("converged in "+str(zzzz)+" iterations")
+
+		# improves the performances
+		g = self.neighborhood(win, sig)*eta
+
+		# print(f"eta ={eta}, sigma ={sig} ")
+		it = nditer(g, flags=['multi_index'])
+
+		while not it.finished:
+			# eta * neighborhood_function * (x-w)
+			# print("index", it.multi_index)
+			x_w = (x - self._weights[it.multi_index])
+			# print("delta = ", max(g[it.multi_index] * x_w))
+			self._weights[it.multi_index] += g[it.multi_index] * x_w
+			# normalization
+			norm = fast_norm(self._weights[it.multi_index])
+			self._weights[it.multi_index] = self._weights[it.multi_index]/norm
+			# print("norm:", norm)
+			it.iternext()
+			
     def quantization(self, data):
         """Assigns a code book (weights vector of the winning neuron)
         to each sample in data."""
@@ -328,7 +321,39 @@ class MiniSom(object):
             idx = iteration % (len(data)-1)
             self.update(data[idx], self.winner(data[idx]),
                         iteration, num_iteration)
+    
+    
+    
+	def train_delta(self, data, delta, max_iteration, verbose=False):
+		"""Trains using all the vectors in data sequentially"""
+		# num_iteration = len(data)
+		self._check_iteration_number(max_iteration)
+		self._check_input_len(data)
+		iterations = range(max_iteration)
+		if verbose:
+			iterations = _incremental_index_verbose(max_iteration)
 
+		delta_w = 1
+		for iteration in iterations:
+			# pick a random sample
+			old_weights = self._weights.copy()
+			eta = self._decay_function(self._learning_rate, iteration, max_iteration)
+			# sigma and learning rate decrease with the same rule
+			sig = self._decay_function(self._sigma, iteration, max_iteration)
+
+			rand_i = self._random_generator.randint(len(data))
+			self.update(data[rand_i], self.winner(data[rand_i]), eta, sig)
+
+			# max_new = np.max(self._weights)
+			delta_w = np.max(np.abs(old_weights - self._weights))
+			print(f"iteration= {iteration} delta = {delta_w}")
+			if delta_w < delta:
+				break
+
+
+
+
+    
     def distance_map(self):
         """Returns the distance map of the weights.
         Each cell is the normalised sum of the distances between
@@ -513,7 +538,7 @@ class TestMinisom(unittest.TestCase):
         q1 = som.quantization_error(data)
         som.train_random(data, 10, verbose=True)
         assert q1 > som.quantization_error(data)
-
+	
     def test_random_weights_init(self):
         som = MiniSom(2, 2, 2, random_seed=1)
         som.random_weights_init(array([[1.0, .0]]))
