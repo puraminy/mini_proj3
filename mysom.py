@@ -325,7 +325,7 @@ class MiniSom(object):
             self.update(data[idx], self.winner(data[idx]),
                         eta, sig)
 
-    def train_delta(self, data, delta, max_iteration, verbose=False, decay_lr=0, decay_sigma=0, delta_func='max'):
+    def train_delta(self, data, delta, max_iteration, verbose=False, decay_lr=None, decay_sigma=None, delta_func='mean'):
         """Trains using all the vectors in data sequentially"""
         # num_iteration = len(data)
         self._check_iteration_number(max_iteration)
@@ -341,12 +341,12 @@ class MiniSom(object):
             # pick a random sample
             old_weights = self._weights.copy()
             
-            if decay_lr > 0:
-              eta *= decay_lr
+            if decay_lr != None:
+              eta = decay_lr(self._learning_rate, iteration, max_iteration)
             else:
               eta = self._decay_function(self._learning_rate, iteration, max_iteration)
-            if decay_sigma > 0:
-              sig *= decay_sigma              
+            if decay_sigma != None:
+              sig = decay_sigma(self._sigma, iteration, max_iteration)             
             else:
               sig = self._decay_function(self._sigma, iteration, max_iteration)
 
