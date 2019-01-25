@@ -345,8 +345,8 @@ class MiniSom(object):
               eta *= decay_lr
             else:
               eta = self._decay_function(self._learning_rate, iteration, max_iteration)
-            if decay_sigma > 0
-              sig * = decay_sigma              
+            if decay_sigma > 0:
+              sig *= decay_sigma              
             else:
               sig = self._decay_function(self._sigma, iteration, max_iteration)
 
