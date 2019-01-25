@@ -1,3 +1,10 @@
+# The main source of this code belongs to miniSOM library https://github.com/JustGlowing/minisom
+# Modified by Ahmad Pouramini and Benyamin Hosseiny
+# Modified parts:
+# Converging based on delta_W (Weight matrix) (maximun difference or mean difference)
+# Various decay fuctions such as exponential and geometrical
+
+
 from math import sqrt
 import matplotlib.pyplot as plt
 import numpy as np
