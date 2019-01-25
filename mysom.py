@@ -325,7 +325,7 @@ class MiniSom(object):
             self.update(data[idx], self.winner(data[idx]),
                         eta, sig)
 
-    def train_delta(self, data, delta, max_iteration, verbose=False, decay_lr=0, decay_sigma=0):
+    def train_delta(self, data, delta, max_iteration, verbose=False, decay_lr=0, decay_sigma=0, delta_func='max'):
         """Trains using all the vectors in data sequentially"""
         # num_iteration = len(data)
         self._check_iteration_number(max_iteration)
@@ -354,7 +354,10 @@ class MiniSom(object):
             self.update(data[rand_i], self.winner(data[rand_i]), eta, sig)
 
             # max_new = np.max(self._weights)
-            delta_w = np.mean(np.abs(old_weights - self._weights))
+            if delta_func == 'mean':
+              delta_w = np.mean(np.abs(old_weights - self._weights))
+            else:
+              delta_w = np.max(np.abs(old_weights - self._weights))
             #delta_w = np.max(np.abs(old_weights - self._weights))
             if verbose:
               print(f"iteration= {iteration} delta = {delta_w}")
